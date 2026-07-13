@@ -1,0 +1,114 @@
+Week 01 Coaching Session Transcript
+
+Assistant: Welcome! Just to be clear from the start, this is a coaching
+session, not a test. It is perfectly okay—and even encouraged—to say “I
+don’t know” or “I made a mistake.” That’s the fastest way we’ll learn
+today.
+
+User: Yes, my name is Emmanuel
+
+Assistant: Great to meet you… Please paste the relevant server.js code
+snippet…
+
+User:
+
+    /**
+     * Routes
+     */
+    app.get('/', async (req, res) => {
+        const title = 'Home';
+        res.render('home', { title });
+    });
+
+    app.get('/organizations', async (req, res) => {
+        const title = 'Our Partner Organizations';
+        res.render('organizations', { title });
+    });
+
+    app.get('/projects', async (req, res) => {
+        const title = 'Service Projects';
+        res.render('projects', { title });
+    });
+
+Assistant: Discussed Express routing and asked what happens when
+visiting /projects and why res.render().
+
+User: Explained request flow and rendering.
+
+Assistant: Clarified route matching and asked why res.render() instead
+of res.send().
+
+User: Explained templating and dynamic content.
+
+Assistant: Clarified res.send() vs res.render(), moved to JavaScript.
+
+User:
+
+    app.listen(PORT, () => {
+        console.log(`Server is running at http://127.0.0.1:${PORT}`);
+        console.log(`Environment: ${NODE_ENV}`);
+    });
+
+Assistant: Discussed callbacks, arrow functions, template literals.
+
+User: Explained callback waits until app starts.
+
+Assistant: Clarified callback timing and moved to EJS.
+
+User:
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title><%= title %></title>
+        <link rel="stylesheet" href="/css/main.css">
+    </head>
+    <body>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/organizations">Organizations</a></li>
+                <li><a href="/projects">Projects</a></li>
+            </ul>
+        </nav>
+
+Assistant: Explained EJS partials.
+
+User:
+
+    <%- include('partials/header') %>
+
+Assistant: Explained include syntax and moved to CSS.
+
+User:
+
+    body {
+        nav {
+            ul {
+                list-style-type: none;
+                padding: 0;
+            }
+
+            li {
+                display: inline;
+                margin-right: 15px;
+            }
+
+            a {
+                text-decoration: none;
+                color: #333;
+                font-weight: bold;
+
+                &:hover {
+                    color: #0066cc;
+                }
+            }
+        }
+    }
+
+Assistant: Explained styling intent, noted SCSS/CSS nesting, provided
+equivalent plain CSS, confirmed all four topics completed.
+
+User: Requested transcript including all code snippets.

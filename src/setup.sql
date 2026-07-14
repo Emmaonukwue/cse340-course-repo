@@ -63,3 +63,45 @@ VALUES
 (3, 'Water Sanitation Project', 'Installing clean water facilities in underserved communities.', 'Makurdi, Nigeria', '2026-09-30'),
 (3, 'Community Sports Festival', 'Sports competition promoting youth engagement and teamwork.', 'Asaba, Nigeria', '2026-10-18');
 
+CREATE TABLE category (
+    category_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE project_category (
+    project_id INT NOT NULL,
+    category_id INT NOT NULL,
+    PRIMARY KEY (project_id, category_id),
+    CONSTRAINT fk_project_category_project
+        FOREIGN KEY (project_id)
+        REFERENCES service_project (project_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_project_category_category
+        FOREIGN KEY (category_id)
+        REFERENCES category (category_id)
+        ON DELETE CASCADE
+);
+
+-- ========================================
+-- Associate Projects with Categories
+-- ========================================
+
+INSERT INTO project_category (project_id, category_id)
+VALUES
+(1, 3),   -- Community Clean-Up → Environment
+(2, 1),   -- School Supply Drive → Education
+(3, 4),   -- Food Bank Distribution → Community Development
+(4, 3),   -- Tree Planting Initiative → Environment
+(5, 2),   -- Health Awareness Campaign → Health
+
+(6, 2),   -- Blood Donation Drive → Health
+(7, 3),   -- Beach Clean-Up → Environment
+(8, 1),   -- Youth Coding Workshop → Education
+(9, 4),   -- Senior Citizen Support → Community Development
+(10, 1),  -- Community Library Setup → Education
+
+(11, 2),  -- Free Medical Outreach → Health
+(12, 4),  -- Orphanage Visit → Community Development
+(13, 5),  -- Career Mentorship Program → Youth Empowerment
+(14, 4),  -- Water Sanitation Project → Community Development
+(15, 5);  -- Community Sports Festival → Youth Empowerment

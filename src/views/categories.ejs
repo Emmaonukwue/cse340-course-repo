@@ -1,0 +1,11 @@
+<%- include('partials/header') %>
+<main>
+    <h1><%= title %></h1>
+    <p>Here are a few of our service categories:</p>
+    <ul>
+        <% categories.forEach(category => { %>
+            <li><%= category.category_id %>. <%= category.name %></li>
+        <% }); %>
+    </ul>
+</main>
+<%- include('partials/footer') %>

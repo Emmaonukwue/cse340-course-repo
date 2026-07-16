@@ -1,0 +1,278 @@
+# Week 02 Coaching Session Transcript
+
+**Assistant:**
+Welcome! Just to be clear from the start, this is a coaching session, not a test. It is perfectly okay—and even encouraged—to say **"I don't know"** or **"I made a mistake."** That's the fastest way we'll learn today.
+
+I'm your Learning Coach and Software Mentor, and my role is to help you understand your assignment, identify any knowledge gaps, and discuss the reasoning behind your implementation. This is a safe learning space where mistakes are expected and are one of the best ways to learn.
+
+Before we begin, could you please confirm your name?
+
+*(Since we're using a chat interface, whenever we discuss code, I'll ask you to paste the relevant code snippet into the chat rather than referring to files directly. We'll cover all four required topics—database design, Node.js data access, Express routing, and EJS rendering—and at the end of our session I'll prepare the entire conversation as a downloadable `.txt` file.)*
+
+---
+
+**User:**
+Emmanuel Onukwue
+
+---
+
+**Assistant:**
+Thank you, Emmanuel.
+
+It's great to meet you, and welcome again. Remember, this is a coaching session—not a test. There are no trick questions, and it's completely okay to say, "I don't know," or "I made a mistake." My goal is simply to help you explain your work and strengthen your understanding.
+
+**Our first topic will be Relational Database Design and Structure.**
+
+**Question:** Could you please **paste the SQL code** (or the relevant `CREATE TABLE` statements) for one or more of your database tables that you'd like us to discuss?
+
+---
+
+**User:**
+
+```sql
+-- ========================================
+-- Organization Table
+-- ========================================
+CREATE TABLE organization (
+    organization_id SERIAL PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    description TEXT NOT NULL,
+    contact_email VARCHAR(255) NOT NULL,
+    logo_filename VARCHAR(255) NOT NULL
+);
+```
+
+---
+
+**Assistant:**
+Thanks for sharing that code, Emmanuel.
+
+This is a good, non-trivial example. I can see you've created an `organization` table with:
+
+* `organization_id` as a `SERIAL` primary key, which automatically generates unique IDs.
+* `name` to store the organization's name.
+* `description` for more detailed information.
+* `contact_email` for the organization's email address.
+* `logo_filename` to store the filename of the organization's logo.
+* `NOT NULL` constraints on all columns to ensure every record contains the required information.
+
+**Question:** What is the purpose of the `organization` table in your application, and why did you decide to include these particular columns?
+
+---
+
+**User:**
+The purpose of this organization table is to store the properties or details of every organization that my app has or recieves in the future. I decided to use those columns because those are the information each organization has.
+
+---
+
+**Assistant:**
+That's a clear explanation, Emmanuel.
+
+Your reasoning makes sense. The `organization` table serves as a central place to store information about each organization in your application. Choosing columns like `name`, `description`, `contact_email`, and `logo_filename` reflects the core details you want to keep for every organization. Using a separate table for this information also makes the database easier to maintain and avoids duplicating organization details elsewhere.
+
+**Question:** Could you now **paste one SQL query** from your project that uses this table (or another table), so we can discuss what it does and why you wrote it that way?
+
+---
+
+**User:**
+
+```sql
+-- ========================================
+-- Insert sample data: Organizations
+-- ========================================
+INSERT INTO organization (name, description, contact_email, logo_filename)
+VALUES
+('BrightFuture Builders', 'A nonprofit focused on improving community infrastructure through sustainable construction projects.', 'info@brightfuturebuilders.org', 'brightfuture-logo.png'),
+('GreenHarvest Growers', 'An urban farming collective promoting food sustainability and education in local neighborhoods.', 'contact@greenharvest.org', 'greenharvest-logo.png'),
+('UnityServe Volunteers', 'A volunteer coordination group supporting local charities and service initiatives.', 'hello@unityserve.org', 'unityserve-logo.png');
+```
+
+---
+
+**Assistant:**
+Thank you, Emmanuel.
+
+The code you shared is actually an **`INSERT` statement**, which is used to add data into the `organization` table. It inserts three sample organizations, each with a name, description, contact email, and logo filename. This is useful for testing your application and ensuring there is data available while developing and demonstrating your project.
+
+For our discussion on SQL queries, though, I'd like to look at a query that **retrieves or manipulates data**, such as a `SELECT`, `UPDATE`, `DELETE`, or a query involving a `JOIN`.
+
+**Question:** Could you please **paste one `SELECT` query** from your project that you use to retrieve data from the database?
+
+---
+
+**User:**
+
+```javascript
+const query = `
+    SELECT organization_id, name, description, contact_email, logo_filename
+    FROM public.organization;
+`;
+```
+
+---
+
+**Assistant:**
+Thanks, Emmanuel. This is exactly the kind of SQL query we want to discuss.
+
+Your query retrieves all the records from the `organization` table in the `public` schema. Instead of using `SELECT *`, you explicitly listed the columns you wanted to return. That's often considered a good practice because it makes the query clearer, returns only the data your application needs, and can improve performance when tables have many columns.
+
+**Question:** Why did you choose to list each column individually instead of using `SELECT *`?
+
+---
+
+**User:**
+I chose to list each column not only because it's the professional standard but to make data retrieval easy and fast because this helps the query go straight to the listed columns. Also, SELECT * may fetch some credentials in the table that I do not wish to make public and give hackers unauthorized access to them.
+
+---
+
+**Assistant:**
+That's a strong explanation, Emmanuel.
+
+You touched on several important points:
+
+* Professional practice.
+* Efficiency by returning only the required data.
+* Security by avoiding accidental exposure of sensitive columns.
+
+One small refinement: the main performance benefit is reducing the amount of unnecessary data returned, rather than the database locating the columns more quickly.
+
+**Question:** Could you now **paste the Node.js function** that executes this SQL query and connects to the database so we can discuss how the server retrieves the data?
+
+---
+
+**User:**
+*(Pasted the `models/db.js` database wrapper with SQL logging, `testConnection()`, and explained that `getAllOrganizations()` executes the query using `const result = await db.query(query); return result.rows;`.)*
+
+---
+
+**Assistant:**
+Excellent, Emmanuel.
+
+The data retrieval flow is:
+
+1. The SQL query is defined.
+2. `getAllOrganizations()` calls `db.query(query)`.
+3. `db.js` executes the query using the PostgreSQL connection pool (with logging enabled during development).
+4. `result.rows` is returned to the application.
+
+I also like that you've separated responsibilities:
+
+* `db.js` manages the database connection.
+* `organizations.js` contains organization-specific database operations.
+
+This follows good software engineering practices.
+
+**Question:** Why did you decide to place the database query inside a `getAllOrganizations` model method instead of writing the SQL directly inside your Express route handler?
+
+---
+
+**User:**
+Just like you said I did that to keep things organized and clean, making it easier to maintain as sustainibility is important in this field. Having all the queries in the route handler doesn't look clean to me because it would so much and finding one out of them all would be a big task during debugging or troubleshooting.
+
+---
+
+**Assistant:**
+That's an excellent explanation, Emmanuel.
+
+You demonstrated a solid understanding of:
+
+* Separation of concerns.
+* Maintainability.
+* Readability.
+* Easier debugging.
+
+We've now completed **Topic 2: Server-Side Data Access Logic (Node.js).**
+
+**Question:** Could you now **paste one Express routing declaration** from your main server file (or the file where your routes are registered) so we can discuss how the route is mapped and what its role is?
+
+---
+
+**User:**
+
+```javascript
+app.get('/projects', async (req, res) => {
+    const projects = await getAllProjects();
+    console.log(projects);
+
+    const title = 'Service Projects';
+    res.render('projects', { title, projects });
+});
+```
+
+---
+
+**Assistant:**
+Thanks, Emmanuel.
+
+This is a great example of an Express route handler.
+
+The flow is:
+
+1. A user visits `/projects`.
+2. Express matches the request to `app.get('/projects', ...)`.
+3. The handler executes.
+4. `getAllProjects()` retrieves data from the model.
+5. The data is stored in `projects`.
+6. `res.render('projects', { title, projects })` passes the data to the EJS template.
+
+This keeps the route focused on request handling while the model manages database access.
+
+We've now completed **Topic 3: Express Server Logic and Routing.**
+
+**Question:** Could you now **paste one line of EJS code** from your `projects.ejs` (or another EJS template) that displays data from the server, so we can discuss how the data flows from Express into the view?
+
+---
+
+**User:**
+
+```ejs
+<li><strong><%= project.formattedDate %>: <%= project.title %> (<%= project.organization_name %>)</strong></li>
+```
+
+---
+
+**Assistant:**
+Excellent, Emmanuel.
+
+Your EJS line displays three values from the `project` object:
+
+* `project.formattedDate`
+* `project.title`
+* `project.organization_name`
+
+The `<%= %>` syntax outputs escaped values into the HTML, helping protect against Cross-Site Scripting (XSS).
+
+These values are available because the Express route passes them using:
+
+```javascript
+res.render('projects', { title, projects });
+```
+
+Typically, the template iterates over the `projects` array using a loop such as:
+
+```ejs
+<% projects.forEach(project => { %>
+    ...
+<% }) %>
+```
+
+This demonstrates the complete flow of data:
+
+**Database → Model → Express Route → `res.render()` → EJS Template → Browser**
+
+You explained your implementation very well and demonstrated a good understanding of:
+
+* Relational Database Design
+* SQL Queries
+* Node.js Data Access
+* Express Routing
+* EJS Rendering
+
+We've successfully covered all four required topics:
+
+✅ Topic 1 – Relational Database Design and Structure
+✅ Topic 2 – Server-Side Data Access Logic (Node.js)
+✅ Topic 3 – Express Server Logic and Routing
+✅ Topic 4 – Client-Side Rendering (EJS Templates)
+
+This concludes our Week 02 coaching session.

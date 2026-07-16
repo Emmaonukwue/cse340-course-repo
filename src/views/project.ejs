@@ -1,0 +1,10 @@
+<%- include('partials/header') %>
+<main>
+    <h2><%= title %></h2>
+    <h3>Title: <strong><%= projectDetails.title %></strong></h3>
+    <p><strong>Description:</strong> <%= projectDetails.description %></p>
+    <p><strong>Date:</strong> <%= projectDetails.formattedDate %></p>
+    <p><strong>Location:</strong> <%= projectDetails.location %></p>
+    <p><strong>Organization:</strong> <a href="/organization/<%= projectDetails.organization_id %>"><%= projectDetails.organization_name %></a></p>
+</main>
+<%- include('partials/footer') %>

@@ -83,6 +83,19 @@ CREATE TABLE project_category (
 );
 
 -- ========================================
+-- Insert Categories
+-- ========================================
+
+INSERT INTO category (name)
+VALUES
+('Education'),
+('Health'),
+('Environment'),
+('Community Development'),
+('Youth Empowerment');
+
+
+-- ========================================
 -- Associate Projects with Categories
 -- ========================================
 

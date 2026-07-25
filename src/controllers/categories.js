@@ -1,5 +1,6 @@
 import { getAllCategories, getCategoryById, 
-    getCategoriesByProjectId, updateCategoryAssignments, createCategory } from '../models/categories.js';
+    getCategoriesByProjectId, updateCategoryAssignments, 
+    createCategory, updateCategory } from '../models/categories.js';
 import { getProjectsByCategoryId, getProjectDetails } from '../models/projects.js';
 import { body, validationResult } from 'express-validator';
 
@@ -78,7 +79,35 @@ const categoryValidation = [
     .isLength({ min: 3, max: 100 }).withMessage('Category name must be between 3 and 100 characters.')
 ];
 
+const editCategoryForm = async (req, res) => {
+    const categoryId = req.params.id;
+    const categoryDetails = await getCategoryById(categoryId);
+    const title = 'Edit Category';
+
+    res.render('edit-category', { title, categoryDetails });
+};
+
+const processEditCategoryForm = async (req, res) => {
+    // Check for validation errors
+    const results = validationResult(req);
+    if (!results.isEmpty()) {
+        // Validation failed - loop through errors
+        results.array().forEach((error) => {
+            req.flash('error', error.msg);
+        });
+
+        // Redirect back to the edit category form
+        return res.redirect('/edit-category/' + req.params.id);
+    }
+    const categoryId = req.params.id;
+    const { name } = req.body;
+
+    await updateCategory(categoryId, name);
+    req.flash('success', 'Category updated successfully.');
+    res.redirect(`/category/${categoryId}`);
+};
+
 export { categoriesPage, categoryDetailsPage, 
     assignCategoriesForm, processAssignCategoriesForm, 
     newCategoryForm, processNewCategoryForm, 
-    categoryValidation };
+    categoryValidation, editCategoryForm, processEditCategoryForm };

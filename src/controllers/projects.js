@@ -80,9 +80,9 @@ const editProjectForm = async (req, res) => {
     const projectId = req.params.id;
     const projectDetails = await getProjectDetails(projectId);
     const organizations = await getAllOrganizations();
-    const title = 'Edit Service Project'
+    const title = 'Edit Service Project';
 
-    res.render('edit-project', {title, projectDetails, organizations});
+    res.render('edit-project', { title, projectDetails, organizations });
 };
 
 const processEditProjectForm = async (req, res) => {
@@ -109,4 +109,5 @@ const processEditProjectForm = async (req, res) => {
 
 export { projectsPage, projectDetailsPage, 
     newProjectForm, processNewProjectForm, 
-    projectValidation, editProjectForm, processEditProjectForm };
+    projectValidation, editProjectForm, 
+    processEditProjectForm };

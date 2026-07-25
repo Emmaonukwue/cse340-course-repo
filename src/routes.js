@@ -2,27 +2,19 @@ import express from 'express';
 
 import { homePage } from './controllers/index.js';
 import { 
-    organizationsPage, 
-    organizationDetailsPage, 
-    newOrganizationForm, 
-    processNewOrganizationForm, 
-    organizationValidation, 
-    editOrganizationForm, 
+    organizationsPage, organizationDetailsPage, 
+    newOrganizationForm, processNewOrganizationForm, 
+    organizationValidation, editOrganizationForm, 
     processEditOrganizationForm } from './controllers/organizations.js';
-import { projectsPage, 
-        projectDetailsPage, 
-        newProjectForm, 
-        processNewProjectForm, 
-        projectValidation, 
-        processEditProjectForm,
+import { projectsPage, projectDetailsPage, 
+        newProjectForm, processNewProjectForm, 
+        projectValidation, processEditProjectForm,
         editProjectForm} from './controllers/projects.js';
-import { categoriesPage, 
-    categoryDetailsPage, 
-    assignCategoriesForm, 
-    processAssignCategoriesForm, 
-    newCategoryForm, 
-    processNewCategoryForm, 
-    categoryValidation } from './controllers/categories.js';
+import { categoriesPage, categoryDetailsPage, 
+    assignCategoriesForm, processAssignCategoriesForm, 
+    newCategoryForm, processNewCategoryForm, 
+    categoryValidation, editCategoryForm, 
+    processEditCategoryForm } from './controllers/categories.js';
 import { testErrorPage } from './controllers/errors.js';
 
 const router = express.Router();
@@ -65,6 +57,10 @@ router.post('/assign-categories/:projectId', processAssignCategoriesForm);
 router.get('/new-category', newCategoryForm);
 // Route to handle new category form submission
 router.post('/new-category', categoryValidation, processNewCategoryForm);
+// Route for edit category form
+router.get('/edit-category/:id', editCategoryForm);
+// Route to handle edit category form submission
+router.post('/edit-category/:id', categoryValidation, processEditCategoryForm);
 
 // error-handling routes
 router.get('/test-error', testErrorPage);

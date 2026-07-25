@@ -19,7 +19,10 @@ import { projectsPage,
 import { categoriesPage, 
     categoryDetailsPage, 
     assignCategoriesForm, 
-    processAssignCategoriesForm } from './controllers/categories.js';
+    processAssignCategoriesForm, 
+    newCategoryForm, 
+    processNewCategoryForm, 
+    categoryValidation } from './controllers/categories.js';
 import { testErrorPage } from './controllers/errors.js';
 
 const router = express.Router();
@@ -51,14 +54,17 @@ router.post('/new-project', projectValidation, processNewProjectForm);
 // Route for edit service project form
 router.get('/edit-project/:id', editProjectForm);
 // Route to handle edit service project form submission
-router.post('/edit-project/:id', processEditProjectForm)
+router.post('/edit-project/:id', projectValidation, processEditProjectForm);
 
 // Route for assign categories to project page
 router.get('/assign-categories/:projectId', assignCategoriesForm);
 // Route to handle the assign categories to project submission
 router.post('/assign-categories/:projectId', processAssignCategoriesForm);
 
-
+// Route for new category page
+router.get('/new-category', newCategoryForm);
+// Route to handle new category form submission
+router.post('/new-category', categoryValidation, processNewCategoryForm);
 
 // error-handling routes
 router.get('/test-error', testErrorPage);

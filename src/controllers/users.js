@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { createUser, authenticateUser } from '../models/users.js';
+import { createUser, authenticateUser, getAllUsers } from '../models/users.js';
 import { body, validationResult } from 'express-validator';
 
 const userRegistrationForm = (req, res) => {
@@ -93,4 +93,12 @@ const requireRole = (role) => {
     };
 };
 
-export { userRegistrationForm, processUserRegistrationForm,  loginForm,  processLoginForm, processLogout, requireLogin, requireRole};
+const usersPage = async (req, res) => {
+    const users = await getAllUsers();
+    const title = 'Users';
+    res.render('users', { title, users });
+};
+
+export { userRegistrationForm, processUserRegistrationForm,  
+    loginForm,  processLoginForm, processLogout, 
+    requireLogin, requireRole, usersPage};

@@ -17,7 +17,7 @@ import { categoriesPage, categoryDetailsPage,
     processEditCategoryForm } from './controllers/categories.js';
 import { testErrorPage } from './controllers/errors.js';
 import { userRegistrationForm, processUserRegistrationForm, loginForm, 
-    processLoginForm, processLogout, requireLogin, requireRole
+    processLoginForm, processLogout, requireLogin, requireRole, usersPage
  } from './controllers/users.js';
  import { dashboardPage } from './controllers/dashboard.js';
 
@@ -78,6 +78,9 @@ router.get('/logout', processLogout);
 
 // Dashboard route (requires login)
 router.get('/dashboard', requireLogin, dashboardPage);
+
+// Users route (requires login and admin role)
+router.get('/users', requireLogin, requireRole('admin'), usersPage);
 
 // error-handling routes
 router.get('/test-error', testErrorPage);

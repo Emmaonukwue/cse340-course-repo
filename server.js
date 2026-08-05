@@ -56,6 +56,11 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use((req, res, next) => {
+    res.locals.user = req.session.user || null;
+    next();
+});
+
 // Allow Express to receive and process common POST data
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

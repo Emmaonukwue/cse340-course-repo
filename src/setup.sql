@@ -63,6 +63,11 @@ VALUES
 (3, 'Water Sanitation Project', 'Installing clean water facilities in underserved communities.', 'Makurdi, Nigeria', '2026-09-30'),
 (3, 'Community Sports Festival', 'Sports competition promoting youth engagement and teamwork.', 'Asaba, Nigeria', '2026-10-18');
 
+
+-- ========================================
+-- Category Table and Project-Category Association
+-- ========================================
+
 CREATE TABLE category (
     category_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL
@@ -118,3 +123,39 @@ VALUES
 (13, 5),  -- Career Mentorship Program → Youth Empowerment
 (14, 4),  -- Water Sanitation Project → Community Development
 (15, 5);  -- Community Sports Festival → Youth Empowerment
+
+
+-- ========================================
+-- Roles Table
+-- ========================================
+
+CREATE TABLE roles (
+    role_id SERIAL PRIMARY KEY,
+    role_name VARCHAR(50) UNIQUE NOT NULL,
+    role_description TEXT
+);
+
+-- ========================================
+-- Insert Roles
+-- ========================================
+
+INSERT INTO roles (role_name, role_description) VALUES 
+    ('user', 'Standard user with basic access'),
+    ('admin', 'Administrator with full system access');
+
+-- Verify the data was inserted
+SELECT * FROM roles;
+
+-- ========================================
+-- Users Table
+-- ========================================
+
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role_id INTEGER REFERENCES roles(role_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+

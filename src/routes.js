@@ -16,6 +16,10 @@ import { categoriesPage, categoryDetailsPage,
     categoryValidation, editCategoryForm, 
     processEditCategoryForm } from './controllers/categories.js';
 import { testErrorPage } from './controllers/errors.js';
+import { userRegistrationForm, processUserRegistrationForm, loginForm, 
+    processLoginForm, processLogout, requireLogin
+ } from './controllers/users.js';
+ import { dashboardPage } from './controllers/dashboard.js';
 
 const router = express.Router();
 
@@ -61,6 +65,19 @@ router.post('/new-category', categoryValidation, processNewCategoryForm);
 router.get('/edit-category/:id', editCategoryForm);
 // Route to handle edit category form submission
 router.post('/edit-category/:id', categoryValidation, processEditCategoryForm);
+
+// User registration routes
+router.get('/register', userRegistrationForm);
+router.post('/register', processUserRegistrationForm);
+
+// User login routes
+router.get('/login', loginForm);
+router.post('/login', processLoginForm);    
+// User logout route
+router.get('/logout', processLogout);
+
+// Dashboard route (requires login)
+router.get('/dashboard', requireLogin, dashboardPage);
 
 // error-handling routes
 router.get('/test-error', testErrorPage);

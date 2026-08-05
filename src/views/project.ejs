@@ -6,13 +6,18 @@
     <p><strong>Date:</strong> <%= projectDetails.formattedDate %></p>
     <p><strong>Location:</strong> <%= projectDetails.location %></p>
     <p><strong>Organization:</strong> <a href="/organization/<%= projectDetails.organization_id %>"><%= projectDetails.organization_name %></a></p>
-    <p><a href="/edit-project/<%= projectDetails.project_id %>">Edit Project</a></p>
+    
+    <% if (user && user.role_name === 'admin') { %>
+        <p><a href="/edit-project/<%= projectDetails.project_id %>">Edit Project</a></p>
+    <% } %>
 
     <hr>
     <p><strong>Categories:</strong><% projectCategories.forEach(category => { %>
             <a href="/category/<%= category.category_id %>"><%= category.name %></a>, 
         <% }); %>
     </p>
-    <a href="/assign-categories/<%= projectDetails.project_id %>">Edit Categories</a>
+    <% if (user && user.role_name === 'admin') { %>
+        <a href="/assign-categories/<%= projectDetails.project_id %>">Edit Categories</a>
+    <% } %>
 </main>
 <%- include('partials/footer') %>

@@ -1,9 +1,12 @@
 import { requireLogin } from "./users.js";
+import { getProjectVolunteerByUserId } from '../models/projects.js';
 
-const dashboardPage = (req, res) => {
+const dashboardPage = async (req, res) => {
     const title = 'Dashboard';
     const user = req.session.user;
-    res.render('dashboard', { title, user });
+    const userId = user.user_id;
+    const volunteerProjects = await getProjectVolunteerByUserId(userId);
+    res.render('dashboard', { title, user, volunteerProjects });
 };
 
 export { dashboardPage };

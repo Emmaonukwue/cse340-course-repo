@@ -145,7 +145,96 @@ const updateProject = async (projectId, title, description, location, date, orga
 
 }
 
+// Add Volunteer to Project
+const addVolunteerToProject = async (projectId, userId) => {
+  const query = `
+    INSERT INTO project_volunteer (project_id, user_id)
+    VALUES ($1, $2)
+    RETURNING *;
+  `;
+
+  const queryParams = [projectId, userId];
+  const result = await db.query(query, queryParams);
+
+  if (result.rows.length === 0) {
+    throw new Error('Failed to add volunteer to project');
+  }
+
+  if (process.env.ENABLE_SQL_LOGGING === 'true') {
+    console.log('Added volunteer to project');
+  }
+
+  return result.rows[0].project_id;
+}; 
+
+const removeVolunteerFromProject = async (projectId, userId) => {
+  const query = `
+    DELETE FROM project_volunteer
+    WHERE project_id = $1 AND user_id = $2
+    RETURNING *;
+  `;
+
+  const queryParams = [projectId, userId];
+  const result = await db.query(query, queryParams);
+
+  if (result.rows.length === 0) {
+    throw new Error('Failed to remove volunteer from project');
+  }
+
+  if (process.env.ENABLE_SQL_LOGGING === 'true') {
+    console.log('Removed volunteer from project');
+  }
+
+  return result.rows[0].project_id;
+};
+
+const getProjectVolunteerByUserId = async (userId) => {
+      const query = `
+        SELECT
+              pv.project_id,
+              sp.title,
+              sp.description,
+              sp.location,
+              sp.project_date,
+              o.organization_id,
+              o.name AS organization_name
+          FROM project_volunteer AS pv
+          INNER JOIN service_project AS sp
+              ON pv.project_id = sp.project_id
+          INNER JOIN organization AS o
+              ON sp.organization_id = o.organization_id
+          WHERE pv.user_id = $1
+          ORDER BY sp.project_date ASC;
+    `;
+
+      const queryParams = [userId];
+      const result = await db.query(query, queryParams);
+
+      result.rows.forEach(project => {
+        project.formattedDate = formatDate(project.project_date);
+        project.inputDate = formatDateForInput(project.project_date);
+      });
+
+      return result.rows;
+};
+
+const checkVolunteer = async (projectId, userId) => {
+
+    const query = `
+        SELECT 1
+        FROM project_volunteer
+        WHERE project_id = $1
+          AND user_id = $2;
+    `;
+
+    const result = await db.query(query, [projectId, userId]);
+
+    return result.rows.length > 0;
+};
+
 export {getAllProjects, getProjectsByOrganizationId, 
         getUpcomingProjects, getProjectDetails, 
         getProjectsByCategoryId, createProject, 
-        updateProject };
+        updateProject, removeVolunteerFromProject, 
+        addVolunteerToProject, getProjectVolunteerByUserId, 
+        checkVolunteer };

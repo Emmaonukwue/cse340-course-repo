@@ -1,0 +1,247 @@
+Week 05 Coaching Session Transcript
+Date: [Current Date]
+Coach: Learning Coach and Software Mentor
+Student: Emmanuel Onukwue
+
+---
+
+COACH: Welcome! Just to be clear from the start, this is a coaching session, not a test. It is perfectly okay—and even encouraged—to say 'I don't know' or 'I made a mistake.' That's the fastest way we'll learn today.
+
+Before we dive in, please confirm your name and tell me a bit about which part of this assignment you're most curious or concerned about.
+
+To get us started with Topic 1 (Registration and Password Hashing) — could you paste the code snippet where you handle user registration, specifically the part where you hash the password before storing it in the database?
+
+---
+
+EMMANUEL: My name is Emmanuel Onukwue.
+
+The part of this assignment that I am most curios about is the Middleware factory which uses other middlewares to function in the project. 
+
+Here is the code snippet where I handled the password hashing during user registration: 
+const processUserRegistrationForm = async (req, res) => {
+    const { name, email, password } = req.body;
+
+    try {
+        // Hash the password before storing it
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(password, salt);
+
+        // Create the user in the database
+        const userId = await createUser(name, email, passwordHash);
+
+        // Redirect to the home page after successful registration
+        req.flash('success', 'Registration successful! Please log in.');
+        res.redirect('/');
+    } catch (error) {
+        console.error('Error registering user:', error);
+        req.flash('error', 'An error occurred during registration. Please try again.');
+        res.redirect('/register');
+    }
+};
+
+---
+
+COACH: Thank you, Emmanuel! It's great to meet you, and I appreciate you sharing that code right away. 
+
+That's a fantastic point of curiosity—middleware factories can feel tricky at first because they add an extra layer of abstraction, but they're incredibly powerful once they click. We'll definitely make that our deep-dive topic today.
+
+Looking at your registration snippet, I notice you're using `bcrypt.genSalt(10)` and then `bcrypt.hash(password, salt)` as two separate steps. 
+
+One question to start: You could also use `bcrypt.hash(password, 10)` directly, which handles salting automatically in one step. What made you choose the two-step approach with `genSalt` and `hash` separately?
+
+---
+
+EMMANUEL: I used that method to make my code understandable and traceable, so I can experience the hashing before its storage.
+
+---
+
+COACH: That's a great answer, Emmanuel! Taking the two-step approach for clarity and learning is a very thoughtful way to code—especially in a learning environment. It shows you understand *what* salting is and *why* it happens before the hash is created, rather than just treating it as a black box. I really appreciate that mindset.
+
+Now, since you mentioned you're most curious about the middleware factory, let's bridge that with Topic 2 (Login and Sessions) before we get to the factory itself.
+
+Could you now paste your login logic snippet—specifically the part where you verify the password and then set up the session for the logged-in user?
+
+---
+
+EMMANUEL: const processLoginForm = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await authenticateUser(email, password);
+        if (user) {
+            // Store user info in session
+            req.session.user = user;
+            req.flash('success', 'Login successful!');
+
+            if (res.locals.NODE_ENV === 'development') {
+                console.log('User logged in:', user);
+            }
+
+            res.redirect('/dashboard');
+        } else {
+            req.flash('error', 'Invalid email or password.');
+            res.redirect('/login');
+        }
+    } catch (error) {
+        console.error('Error during login:', error);
+        req.flash('error', 'An error occurred during login. Please try again.');
+        res.redirect('/login');
+    }
+};
+
+and here is the authenticateUser function in models/users.js
+
+const verifyPassword = async (password, passwordHash) => {
+    return bcrypt.compare(password, passwordHash);
+};
+
+const authenticateUser = async (email, password) => {
+    const user = await userByEmail(email);
+
+    if (!user) {
+        return null; // User not found
+    }
+
+    const isMatch = await verifyPassword(password, user.password_hash);
+
+    if (!isMatch) {
+        return null; // Invalid password
+    }
+
+    // Remove password_hash before returning the user
+    const { password_hash, ...safeUser } = user;
+
+    return safeUser;
+};
+
+which uses userByEmail and verifyPassword functions still in models/users.js
+
+---
+
+COACH: Excellent, Emmanuel. Thank you for sharing both the login controller and the authentication model functions. I can see you've separated concerns nicely—the controller handles the request/response flow and session, while the model handles the database lookup and password verification.
+
+One thing I notice is that in `processLoginForm`, you're storing the entire `user` object (minus the hash) directly into `req.session.user`. 
+
+Question for you: Since you're storing the full user object (which might include fields like `created_at`, `updated_at`, or other database-specific properties), have you considered any risks or downsides to storing the entire object versus only storing specific fields like `id`, `name`, and `role` in the session?
+
+---
+
+EMMANUEL: Yes I actually considered that but since the most confidential detail which is password hash is not stored, I decided to go ahead. Maybe in future updates those can be trimmed accordingly.
+
+---
+
+COACH: That's a very pragmatic approach, Emmanuel. You've identified the main security concern (the password hash) and addressed it, while recognizing that you can always refine the session payload later. That kind of incremental thinking—shipping a working solution and iterating—is exactly what professional developers do. Good call.
+
+Now, let's circle back to what you said you were most curious about: Topic 3 (Protected Access Middleware). 
+
+You mentioned being interested in the "middleware factory which uses other middlewares." Could you paste your middleware implementation code—specifically your `requireLogin` and `requireRole` (or similar) middleware functions, and especially any factory pattern you've used to create them?
+
+---
+
+EMMANUEL: const requireLogin = (req, res, next) => {
+    if (!req.session || !req.session.user) {
+        req.flash('error', 'You must be logged in to access this page.');
+        return res.redirect('/login');
+    }
+    next();
+};
+
+const requireRole = (role) => {
+    return (req, res, next) => {
+        // Check if user is logged in first
+        if (!req.session || !req.session.user) {
+            req.flash('error', 'You must be logged in to access this page.');
+            return res.redirect('/login');
+        }
+        // Check if user's role matches the required role
+        if (req.session.user.role_name !== role) {
+            req.flash('error', 'You do not have permission to access this page.');
+            return res.redirect('/');
+        }
+
+        next();
+    };
+};
+
+---
+
+COACH: Perfect, Emmanuel! You've shown exactly what I was hoping to see—a classic middleware factory pattern with `requireRole(role)` returning a middleware function. That's clean, reusable, and exactly the kind of code that makes Express applications maintainable.
+
+I notice that `requireRole` duplicates the login-check logic from `requireLogin` (checking `req.session.user`). 
+
+One question: Since you have a middleware factory pattern already in place, have you considered—or would you consider—refactoring `requireRole` to *compose* or *chain* `requireLogin` inside it, rather than duplicating that check? If so, how might you approach that?
+
+---
+
+EMMANUEL: I thought about that but I might consider it in the future to reduce the lines of code and repetition but for now I really want everything to be explicit and traceable
+
+---
+
+COACH: That makes complete sense, Emmanuel. Keeping things explicit and traceable is a fantastic strategy, especially while you're building and learning. You're prioritizing readability and debuggability over premature optimization, which is a very mature engineering instinct. When you do refactor later, you'll have a clear target, and your explicit version now will serve as great documentation for what the composed version needs to do.
+
+Alright, we've covered registration, login, and middleware—that brings us to our final mandatory topic: Topic 4 (Protected Access Links and Navigation).
+
+You've already shown me the backend middleware that protects routes. Now I'd like to see how you're handling the frontend side of that—specifically, how you're conditionally showing or hiding navigation links in your EJS/HTML templates based on the logged-in user's role.
+
+Could you paste a snippet of your EJS (or HTML) navigation code where you use the session user's role to decide which links to display?
+
+---
+
+EMMANUEL: <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/organizations">Organizations</a></li>
+            <li><a href="/projects">Projects</a></li>
+            <li><a href="/categories">Categories</a></li>
+
+            <% if (user) { %>
+                <li><a href="/dashboard">My Dashboard</a></li>
+                <li><a href="/logout">Logout</a></li>
+            <% } else { %>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            <% } %>
+        </ul>
+    </nav>
+
+---
+
+COACH: Thank you, Emmanuel. That's a clean, straightforward navigation partial. I like that you're using the `user` variable to toggle between authenticated and unauthenticated states—simple and effective.
+
+Now I notice that you're only checking `if (user)` (logged in or not), but you haven't yet added any role-based conditional links (for example, showing an "Admin Panel" link only if `user.role_name === 'admin'`).
+
+One question: What role-based links or navigation items do you anticipate adding as your application grows, and how would you extend this EJS snippet to conditionally show them based on the user's role?
+
+---
+
+EMMANUEL: More pages like profile update and password reset would be role-based in the future where a user can only update their own profile or reset their own password while admin can update all profiles and be able to reset all users' passwords.
+
+---
+
+COACH: That's an excellent forward-looking answer, Emmanuel. You're already thinking about the distinction between *role-based* access (admin vs. regular user) and *ownership-based* access (users managing their own profiles)—both are critical for real-world applications. 
+
+It also shows you understand that navigation is just the frontend layer; those permissions would need to be enforced by your `requireRole` middleware and possibly an additional `requireOwnership` middleware on the backend. 
+
+Since you've now touched on all four required topics and demonstrated clear thinking about each one, I'd say we've had a very productive session today!
+
+Final question to wrap up: Looking back over our conversation—from password hashing to session management, middleware factories, and role-based navigation—is there any area you still feel uncertain about, or any topic you'd like to revisit or go deeper on before we close?
+
+---
+
+EMMANUEL: Not at the moment. Thank you
+
+---
+
+COACH: You're very welcome, Emmanuel! It has been a genuine pleasure coaching you through this session today. 
+
+You demonstrated strong understanding across all four topics:
+- Registration & Hashing: You chose explicit, traceable code and understood the salting process.
+- Login & Sessions: You carefully separated concerns between controllers and models, and made a conscious decision about what to store in the session.
+- Protected Middleware: You implemented a clean factory pattern and knowingly prioritized clarity over composition—a wise choice for learning.
+- Protected Navigation: You showed awareness that frontend visibility must eventually align with backend ownership and role-based permissions.
+
+You're building excellent habits by thinking through trade-offs, planning for future refactors, and keeping code understandable. Keep that curiosity about middleware factories—it will serve you well.
+
+Best of luck with the rest of your project, Emmanuel. Happy coding!
+
+--- END OF TRANSCRIPT ---

@@ -9,7 +9,8 @@ import {
 import { projectsPage, projectDetailsPage, 
         newProjectForm, processNewProjectForm, 
         projectValidation, processEditProjectForm,
-        editProjectForm} from './controllers/projects.js';
+        editProjectForm, processAddVolunteerToProject, 
+        processRemoveVolunteerFromProject } from './controllers/projects.js';
 import { categoriesPage, categoryDetailsPage, 
     assignCategoriesForm, processAssignCategoriesForm, 
     newCategoryForm, processNewCategoryForm, 
@@ -20,6 +21,7 @@ import { userRegistrationForm, processUserRegistrationForm, loginForm,
     processLoginForm, processLogout, requireLogin, requireRole, usersPage
  } from './controllers/users.js';
  import { dashboardPage } from './controllers/dashboard.js';
+ console.log("ROUTES imported projectDetailsPage:", typeof projectDetailsPage);
 
 const router = express.Router();
 
@@ -81,6 +83,10 @@ router.get('/dashboard', requireLogin, dashboardPage);
 
 // Users route (requires login and admin role)
 router.get('/users', requireLogin, requireRole('admin'), usersPage);
+
+// Routes for adding and removing volunteers from a project
+router.post('/project/:projectId/add-volunteer', requireLogin, processAddVolunteerToProject);
+router.post('/project/:projectId/remove-volunteer', requireLogin, processRemoveVolunteerFromProject);
 
 // error-handling routes
 router.get('/test-error', testErrorPage);

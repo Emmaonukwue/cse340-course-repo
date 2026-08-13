@@ -1,9 +1,58 @@
 <%- include('partials/header') %>
 <main>
     <h1><%= title %></h1>
-    <h2>Dashboard</h2>
-        <p>Full name: <%= user.name %></p>
+    <h2>My Volunteer Projects</h2>
+    <!--       <p>Full name: <%= user.name %></p>
         <p>Email: <%= user.email %></p>
+    -->
+    
+    <hr>
+    <% if (volunteerProjects.length > 0) { %>
+
+        <div class="project-list">
+            <% volunteerProjects.forEach(project => { %>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h3>
+                            <%= project.title %>
+                        </h3>
+                        <p>
+                            <strong>Organization:</strong>
+                            <%= project.organization_name %>
+                        </p>
+                        <p>
+                            <%= project.description %>
+                        </p>
+                        <p>
+                            Location:
+                            <%= project.location %>
+                        </p>
+                        <a 
+                        href="/project/<%= project.project_id %>"
+                        class="btn btn-primary">
+                            View Project
+                        </a>
+                        <form 
+                        action="/project/<%= project.project_id %>/remove-volunteer"
+                        method="POST"
+                        style="display:inline">
+                            <button 
+                            type="submit"
+                            class="btn btn-danger">
+                                Remove Volunteer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+
+    <% } else { %>
+
+        <p>
+            You are not volunteering for any projects yet.
+        </p>
+    <% } %>
     
     <% if (user && user.role_name === 'admin') { %>
         <p><a href="/users">View All Users</a></p>

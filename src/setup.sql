@@ -159,3 +159,28 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE project_volunteer (
+    project_volunteer_id SERIAL PRIMARY KEY,
+    project_id INT NOT NULL,
+    user_id INT NOT NULL,
+    volunteer_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_project
+        FOREIGN KEY (project_id)
+        REFERENCES service_project(project_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE,
+    CONSTRAINT unique_project_user
+        UNIQUE(project_id, user_id)
+);
+
+INSERT INTO project_volunteer (project_id, user_id)
+VALUES
+(1, 2),
+(1, 5),
+(4, 4),
+(1, 6),
+(7, 2);
+
